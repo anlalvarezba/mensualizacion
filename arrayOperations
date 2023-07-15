@@ -6,78 +6,11 @@
 
 using namespace std; 
 
-void mulMat(float X[],float Y[], int xr, int xy, int yc ){
-  float* MM =new float[xr*yc];
-    for(int i=0; i<xr; i++){
-    for(int j=0; j<yc; j++){
-        float accumulator = 0;
-        for(int k=0; k<xy; k++){
-           accumulator += X[(i*xr) + k]*Y[(k*xy) + j]; 
-        } 
-        MM[(i*xr) + j] = accumulator;
-      }
-    }
-    // imprimimos B en pantalla:
-    printf("Esta es la matriz M de la multiplicacion: \n");
-    for(int i=0; i<xr; i++){
-      for(int j=0; j<yc; j++){
-        printf("%5.2f  ", MM[(i*xr) + j]);
-      }
-      printf(" \n");
-    }
-    
-    delete [] MM;
-}
+void imprimir_matriz(float X[], int m, int n );
 
+void mulMat(float X[],float Y[], int xr, int xy, int yc );
 
-// Funcion para transponer una matriz cualquiera de tamano "xr X xc"
-void transMat(float X[], int xr, int xc ){
-  float* TM =new float[xr*xc];
-
-    int counterT = 0;
-    int indexT = 0; 
-    while (counterT < xc)
-    {
-      for (int i = 0; i < xr; i++)
-      {
-        TM[indexT]= X[(i*xc) + counterT];
-        indexT ++;
-      }
-      
-      counterT ++;
-    }
-    
-
-// imprimimos TM en pantalla:
-
-printf("Esta es la matriz ise transpuesta: \n");
-      for(int i=0; i<xr*xc; i++){
-        printf("%5.2f  ", TM[i]);
-      }
-printf(" \n");
-
-      int cut = 0;
-      for(int i=0; i<xr*xc; i++){
-        printf("%5.2f  ", TM[i]);
-        cut ++; 
-        if(cut%xr == 0){
-          printf(" \n");
-        }
-      }
-
-
-  printf("Esta es su matriz traspuesta T: \n");
-  for(int j=0; j<xr; j++){
-    for(int i=0; i<xc; i++){
-      printf("%5.2f  ", TM[(j*xc) + i]);
-      // printf("%5.2f  ", TM[(i*xr) + j]);
-    }
-    printf(" \n");
-  }
-
-  delete [] TM;
-}
-
+void transMat(float X[], int m, int n );
 
 int main(){
     int k = 2; // meses del ano
@@ -93,11 +26,11 @@ int main(){
 
     float datosPrueba[] = {0, 1, 2, 3, 4, 5, 6 ,7 ,8 ,9 , 10, 11};
     
-	  float* A1 =new float [n*n]; // Matriz A inversa del problema de minimizacion
-    float* B =new float[n*m]; // Matriz de ceros y unos
+	  float* A =new float [n*n]; // Matriz A inversa del problema de minimizacion
+    float* B =new float[n*m];
 
-    float* M =new float[n*m]; // Matriz multiplicacion de A1 y B: A1*B
-    float* T =new float[m*n]; // Matriz transpuesta de B
+    float* M =new float[n*m]; // Matriz multiplicacion de A y C: A*C
+    float* T =new float[m*n]; // Matriz transpuesta de C
 
 ///////////////////////// Llenando de elementos los arreglos anteriores:
 
@@ -113,18 +46,25 @@ int main(){
       Y[i] = datosPIB[i];
     }
 
-    // se llena la matriz A1:
+    // se llena la matriz A:
     for(int i=0; i<n; i++){
       for(int j=0; j<n; j++){
         if(i <= j ){
-          A1[(i*n) + j] = i + 1; 
+          A[(i*n) + j] = i + 1; 
         } else {
-          A1[(i*n) + j] = j + 1;
+          A[(i*n) + j] = j + 1;
         }
       }
     }
 
     // se llena la matriz B:
+    // for(int i=0; i<n; i++){
+    //   for(int j=0; j<m; j++){
+    //       B[(i*m) + j] = 1;
+    //   }
+    // }
+
+     // se llena la matriz B:
     int count = 0; 
     int change = 0; 
     for(int i=0; i<n; i++){
@@ -132,9 +72,9 @@ int main(){
       ++ count;
         for(int j=0; j<m; j++){
           if(j == change){
-            B[i*n + j] =  1;
+            B[i*m + j] =  1;
           } else {
-            B[i*n + j] =  0;
+            B[i*m + j] =  0;
           }
         }
       } else {
@@ -143,71 +83,6 @@ int main(){
         i = i - 1; 
       }
     }
-
-    // calculando la matriz M = A1*B
-    // for(int i=0; i<n; i++){
-    //   for(int j=0; j<m; j++){
-    //     float accumulator = 0;
-    //     for(int k=0; k<n; k++){
-    //        accumulator += A1[(i*n) + k]*B[(k*n) + j]; 
-    //     } 
-    //     M[(i*n) + j] = accumulator;
-    //   }
-    // }
-
-//TRANSPUESTA DE UNA MATRIZ
-    // int counterT = 0;
-    // int indexT = 0; 
-    // while (counterT < 3)
-    // {
-    //   for (int i = 0; i < 4; i++)
-    //   {
-    //     T[indexT]= datosPrueba[(i*3) + counterT];
-    //     indexT ++;
-    //   }
-      
-    //   counterT ++;
-    // }
-    
-
-//T[0, 3, 6, 9, 1,= 4, 7, 10, ] = datosPrueba[0, 1, 2, 3, 3,= 4, 5, 6, ]
-// 0  1  2               0 3 6 9
-// 3  4  5     -->       1 4 7 10
-// 6  7  8               2 5 8 11
-// 9  10 11                
-// T[0, 3, 6, 9, 1, 4, 7, 10, 2, 5, 8, 11]
-    // imprimimos B transpuesta o T en pantalla:
-    // printf("Esta es la matriz ise transpuesta: \n");
-    //   for(int i=0; i<12; i++){
-    //     printf("%5.2f  ", T[i]);
-    //   }
-    //   printf(" \n");
-    //         for(int i=0; i<12; i++){
-    //     printf("%5.2f  ", datosPrueba[i]);
-    //   }
-    // for(int j=0; j<3; j++){
-    //   for(int i=0; i<4; i++){
-    //     printf("%5.2f  ", T[(j*3) + i]);
-    //   }
-    //   // printf(" \n");
-    // }
-
-
-    // // calculando la matriz T = B transpuesta
-    // for(int i=0; i<n; i++){
-    //   for(int j=0; j<m; j++){ 
-    //     T[(j*m) + i] = B[(i*n) + j];
-    //   }
-    // }
-
-    // // imprimimos B transpuesta o T en pantalla:
-    // printf("Esta es la matriz B transpuesta: \n");
-    // for(int j=0; j<m; j++){
-    //   for(int i=0; i<n; i++){
-    //     printf("%5.2f  ", T[(j*m) + i]);
-    //   }
-    //   printf(" \n");
-    // }
 
 /////// Imprimiendo los arreglos que se van a usar:
 
@@ -228,85 +103,91 @@ int main(){
     }
 
 
-    // imprimimos A1 en pantalla:
+    // imprimimos A en pantalla:
     printf("Esta es la matriz A^-1 de la minimizacion: \n");
-    for(int i=0; i<n; i++){
-      for(int j=0; j<n; j++){
-        printf("%5.2f  ", A1[(i*n) + j]);
-      }
-      printf(" \n");
-    }
+    imprimir_matriz(A, n, n);
 
-    // imprimimos B en pantalla:
+    //imprimimos C en pantalla:
     printf("Esta es la matriz B del Lagrangiano: \n");
-    for(int i=0; i<n; i++){
-      for(int j=0; j<m; j++){
-        printf("%5.2f  ", B[(i*n) + j]);
-      }
-      printf(" \n");
-    }
-
-    // imprimimos M en pantalla:
-    // printf("Esta es la matriz M de la multiplicacion de A1 y B: \n");
-    // for(int i=0; i<n; i++){
-    //   for(int j=0; j<m; j++){
-    //     printf("%5.2f  ", M[(i*n) + j]);
-    //   }
-    //   printf(" \n");
-    // }
-
-    // imprimimos B transpuesta o T en pantalla:
-    // printf("Esta es la matriz B transpuesta: \n");
-    // for(int j=0; j<m; j++){
-    //   for(int i=0; i<n; i++){
-    //     printf("%5.2f  ", T[(j*m) + i]);
-    //   }
-    //   printf(" \n");
-    // }
+    imprimir_matriz(B, n, m);
 
 
   printf("Esta es la transpuesta de B: \n");
   transMat(B, n, m );
   printf("Esta es la transpuesta de datosPruba: \n");
   transMat(datosPrueba, 4, 3 );
-  // printf("Esta es la transpuesta de A1: \n");
-  // transMat(A1, n, n );
+  // printf("Esta es la transpuesta de A: \n");
+  // transMat(A, n, n );
   // printf("Esta es la transpuesta de datosIse 2x3: \n");
   // transMat(datosISE, 2, 3 );
-  printf("Esta es la multiplicacion A1*B: \n");
-  mulMat(A1,B, n, n, m);
+  printf("Esta es la multiplicacion A*C: \n");
+  mulMat(A,B, n, n, m);
 
 
     // liberamos memoria y evitamos fugas:
       delete [] Z;
       delete [] Y;
       delete [] X;
-      delete [] A1;
+      delete [] A;
       delete [] B;
       delete [] M;
       delete [] T;
+      
+      Z = NULL; 
+      Y = NULL;
+      X = NULL;
+      A = NULL;
+      B = NULL;
+      M = NULL;
+      T = NULL;
 }
 
-// void mulMat(float X[], float Y[], int xr, int xy, int yc ){
-//   float* MM =new float[xr*yc];
-//     for(int i=0; i<xr; i++){
-//     for(int j=0; j<yc; j++){
-//         float accumulator = 0;
-//         for(int k=0; k<xy; k++){
-//            accumulator += X[(i*xr) + k]*Y[(k*xy) + j]; 
-//         } 
-//         MM[(i*xr) + j] = accumulator;
-//       }
-//     }
+// Funcion que imprime una mnatriz mxn cin m columnas y n filas
+void imprimir_matriz(float X[], int m, int n ){
+  for(int i=0;i<m;i++){
+    for(int j=0;j<n;j++){
+      printf("%5.2f  ", X[(i*n) + j]);
+    }
+    printf("\n");
+  }
+  
+}
 
-// // imprimimos B en pantalla:
-//     printf("Desde una funcion aparte Esta es la matriz M de la multiplicacion de X y Y: \n");
-//     for(int i=0; i<xr; i++){
-//       for(int j=0; j<yc; j++){
-//         printf("%5.2f  ", MM[(i*xr) + j]);
-//       }
-//       printf(" \n");
-//     }
+void mulMat(float X[],float Y[], int xr, int xy, int yc ){
+  float* MM =new float[xr*yc];
+    for(int i=0; i<xr; i++){
+    for(int j=0; j<yc; j++){
+        float accumulator = 0;
+        for(int k=0; k<xy; k++){
+           accumulator += X[(i*xy) + k]*Y[(k*yc) + j]; 
+        } 
+        MM[(i*yc) + j] = accumulator;
+      }
+    }
+    imprimir_matriz(MM, xr, yc); 
+    transMat(MM, xr, yc);    
+    delete [] MM;
+    MM = NULL; 
+}
+
+
+// Funcion para transponer una matriz cualquiera de tamano "xr X xc"
+void transMat(float X[], int m, int n ){
+  printf("\nEsta es su matriz:\n \n");
+  imprimir_matriz(X,m,n);
+  
+  float* TM =new float[m*n];
+  for(int i=0; i<m; i++){
+    for(int j=0; j<n; j++){
+      //printf("(%d,%d) %d %d %d /  ",i,j,((n*i) + j), ((m*j)+i),1);
+      TM[(m*j) + i] = X[(n*i) + j];
+    }
     
-//     delete [] MM;
-// }
+  }
+// imprimimos TM en pantalla:
+printf("Esta es su matriz traspuesta T: \n");
+  imprimir_matriz(TM,n,m);
+
+  delete [] TM;
+  TM = NULL;
+}
