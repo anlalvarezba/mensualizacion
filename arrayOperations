@@ -228,16 +228,16 @@ float determinantTwo(float X[], int n, float determinant){
     // for(int i; i<n; i++){
       for(int j=0; j<n; j++){
         float* TD = new float[(n-1)*(n-1)];
+        int x = 0; 
         for(int l=1; l<n; l++){
-          for(int m=0; m<n; m++){
-            for(int k=0; k<n-1; k++){
-            if((m < j)){
-              TD[(l-1)*(n-1) + k ] = X[l*n + k ];
-            } else if(m > j) {
-              TD[(l-1)*(n-1) + k ] = X[l*n + k + 1];
-            } 
+          int y = 0; 
+            for(int m=0; m<n; m++){
+            if((m == j))
+            continue;
+              TD[x*(n-1) + y ] = X[l*n + m ];
+            y++;
             }
-          }
+            x++;
         }
         printf("Esta es la submatriz TD para j =");
         printf("%5d  ", j);
