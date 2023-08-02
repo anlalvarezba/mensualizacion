@@ -221,7 +221,7 @@ float determinantTwo(float X[], int n, float determinant){
   printf("Este es n: \n");
   printf("%5d  ", n);
   if(n == 2){
-  determinant += X[0]*X[3] - X[2]*X[1];
+  return X[0]*X[3] - X[2]*X[1];
   } else {
     printf("La matriz D no es 2x2. \n");
     // float sum = 0;
@@ -243,7 +243,7 @@ float determinantTwo(float X[], int n, float determinant){
         printf("%5d  ", j);
         printf(": \n");
         imprimir_matriz(TD,n-1,n-1);
-        determinant += pow(-1, 1+j)*X[j]*determinantTwo(TD,n-1,determinant);
+        determinant += pow(-1, j)*X[j]*determinantTwo(TD,n-1,determinant);
         delete [] TD;
         TD = NULL; 
       }
