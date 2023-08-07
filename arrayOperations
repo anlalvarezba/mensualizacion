@@ -18,7 +18,7 @@ int main(){
     int k = 5; // meses del ano
     int m = 1; // numero total de anos
     int n = m * k;
-    int nD = 5;
+    int nD = 6;
 
     float* Z =new float [n]; // se declara la serie de datos del ISE
     float* Y =new float [m]; // se declara la serie de datos del PIB disponible
@@ -27,14 +27,14 @@ int main(){
     float datosISE[] = {2.0, 4.0, 8.0, 10.0, 12.0, 14.0};
     float datosPIB[] = {5.0, 6.0, 7.0};
 
-    // float datosPrueba[] = {0, 1, 2, 3, 4, 5, 6 ,7 ,8 ,9 , 10, 11};
     float datosPrueba[] = 
     {
-      1, 3, 5, 9, 1,
-      1, 3, 1, 7, 2,
-      4, 3, 9, 7, 3,
-      5, 2, 0, 9, 4,
-      1, 2, 3, 4, 5
+        1,  3,  5,  9,  1, -8,
+        1,  3,  1,  7,  2,  7,
+        4,  3,  9,  7,  3,  2,
+        5,  2,  0,  9,  4,  1,
+        1,  2,  3,  4,  5,  1,
+       -6,  1, -3,  2,  1,  7
     };
     
 	  float* A =new float [n*n]; // Matriz A inversa del problema de minimizacion
@@ -69,12 +69,6 @@ int main(){
       }
     }
 
-    // se llena la matriz B:
-    // for(int i=0; i<n; i++){
-    //   for(int j=0; j<m; j++){
-    //       B[(i*m) + j] = 1;
-    //   }
-    // }
 
      // se llena la matriz B:
     int count = 0; 
@@ -100,8 +94,6 @@ int main(){
     int sumaD = 0;
     for(int i=0; i<nD; i++){
       for(int j=0; j<nD; j++){
-          // sumaD++; 
-          // D[(i*nD) + j] = sumaD;
           D[(i*nD) + j] = datosPrueba[sumaD];
           sumaD++; 
       }
@@ -157,7 +149,7 @@ int main(){
   printf("Esta es la transpuesta de B: \n");
   transMat(B, n, m );
   printf("Esta es la transpuesta de datosPruba: \n");
-  transMat(datosPrueba, nD, nD );
+  transMat(datosPrueba, 3, 12 );
   // printf("Esta es la transpuesta de A: \n");
   // transMat(A, n, n );
   // printf("Esta es la transpuesta de datosIse 2x3: \n");
@@ -239,7 +231,7 @@ printf("Esta es su matriz traspuesta T: \n");
 
 float determinantTwo(float X[], int n){
   float determinant = 0; 
-          
+
   printf("Este es n: \n");
   printf("%5d  ", n);
   if(n == 2){
