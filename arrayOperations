@@ -12,13 +12,13 @@ void mulMat(float X[],float Y[], int xr, int xy, int yc );
 
 void transMat(float X[], int m, int n );
 
-float determinantTwo(float X[], int n, float determinant);
+float determinantTwo(float X[], int n);
 
 int main(){
-    int k = 2; // meses del ano
-    int m = 3; // numero total de anos
-    int n = m * k; 
-    int nD = 3;
+    int k = 5; // meses del ano
+    int m = 1; // numero total de anos
+    int n = m * k;
+    int nD = 5;
 
     float* Z =new float [n]; // se declara la serie de datos del ISE
     float* Y =new float [m]; // se declara la serie de datos del PIB disponible
@@ -27,7 +27,15 @@ int main(){
     float datosISE[] = {2.0, 4.0, 8.0, 10.0, 12.0, 14.0};
     float datosPIB[] = {5.0, 6.0, 7.0};
 
-    float datosPrueba[] = {0, 1, 2, 3, 4, 5, 6 ,7 ,8 ,9 , 10, 11};
+    // float datosPrueba[] = {0, 1, 2, 3, 4, 5, 6 ,7 ,8 ,9 , 10, 11};
+    float datosPrueba[] = 
+    {
+      1, 3, 5, 9, 1,
+      1, 3, 1, 7, 2,
+      4, 3, 9, 7, 3,
+      5, 2, 0, 9, 4,
+      1, 2, 3, 4, 5
+    };
     
 	  float* A =new float [n*n]; // Matriz A inversa del problema de minimizacion
     float* B =new float[n*m];
@@ -92,8 +100,10 @@ int main(){
     int sumaD = 0;
     for(int i=0; i<nD; i++){
       for(int j=0; j<nD; j++){
+          // sumaD++; 
+          // D[(i*nD) + j] = sumaD;
+          D[(i*nD) + j] = datosPrueba[sumaD];
           sumaD++; 
-          D[(i*nD) + j] = sumaD;
       }
     }
 
@@ -101,10 +111,21 @@ int main(){
   printf("Esta es la matriz D: \n");
   imprimir_matriz(D, nD, nD);
   printf("\n");
-  float determinante = determinantTwo(D,nD,0);
+  float determinante = determinantTwo(D,nD);
   printf("El determinante de D es:");
   printf("%5.2f  ", determinante);
   printf("\n");
+
+
+
+
+  // printf("Esta es la matriz A: \n");
+  // imprimir_matriz(A, n, n);
+  // printf("\n");
+  // // float determinante = determinantTwo(A,n);
+  // printf("El determinante de A es:");
+  // printf("%5.2f  ", determinante);
+  // printf("\n");
 /////// Imprimiendo los arreglos que se van a usar:
 
     // imprimimos Z en pantalla:
@@ -136,7 +157,7 @@ int main(){
   printf("Esta es la transpuesta de B: \n");
   transMat(B, n, m );
   printf("Esta es la transpuesta de datosPruba: \n");
-  transMat(datosPrueba, 4, 3 );
+  transMat(datosPrueba, nD, nD );
   // printf("Esta es la transpuesta de A: \n");
   // transMat(A, n, n );
   // printf("Esta es la transpuesta de datosIse 2x3: \n");
@@ -216,16 +237,15 @@ printf("Esta es su matriz traspuesta T: \n");
 }
 
 
-float determinantTwo(float X[], int n, float determinant){
-  // float determinant = 0; 
+float determinantTwo(float X[], int n){
+  float determinant = 0; 
+          
   printf("Este es n: \n");
   printf("%5d  ", n);
   if(n == 2){
-  return X[0]*X[3] - X[2]*X[1];
+  return (X[0]*X[3] - X[2]*X[1]);
   } else {
     printf("La matriz D no es 2x2. \n");
-    // float sum = 0;
-    // for(int i; i<n; i++){
       for(int j=0; j<n; j++){
         float* TD = new float[(n-1)*(n-1)];
         int x = 0; 
@@ -243,14 +263,12 @@ float determinantTwo(float X[], int n, float determinant){
         printf("%5d  ", j);
         printf(": \n");
         imprimir_matriz(TD,n-1,n-1);
-        determinant += pow(-1, j)*X[j]*determinantTwo(TD,n-1,determinant);
+        determinant = determinant + (pow(-1, j)*X[j]*determinantTwo(TD,n-1));
+        
         delete [] TD;
         TD = NULL; 
       }
-    // }
   }
-  // printf("El determinante es:");
-  // printf("%5.2f  ", determinant);
-  // printf("\n");
+  
   return determinant; 
 }
