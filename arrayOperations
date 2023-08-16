@@ -14,6 +14,8 @@ void transMat(float X[], int m, int n );
 
 float determinantTwo(float X[], int n);
 
+void invMat(float X[], int n);
+
 int main(){
     int k = 5; // meses del ano
     int m = 1; // numero total de anos
@@ -108,6 +110,9 @@ int main(){
   printf("%5.2f  ", determinante);
   printf("\n");
 
+  printf("Aca calculamos la adjunta de D:");
+  invMat(D, nD);  
+  printf("---------------------------------------");
 
 
 
@@ -232,12 +237,12 @@ printf("Esta es su matriz traspuesta T: \n");
 float determinantTwo(float X[], int n){
   float determinant = 0; 
 
-  printf("Este es n: \n");
-  printf("%5d  ", n);
+  // printf("Este es n: \n");
+  // printf("%5d  ", n);
   if(n == 2){
   return (X[0]*X[3] - X[2]*X[1]);
   } else {
-    printf("La matriz D no es 2x2. \n");
+    // printf("La matriz D no es 2x2. \n");
       for(int j=0; j<n; j++){
         float* TD = new float[(n-1)*(n-1)];
         int x = 0; 
@@ -251,10 +256,10 @@ float determinantTwo(float X[], int n){
             }
             x++;
         }
-        printf("Esta es la submatriz TD para j =");
-        printf("%5d  ", j);
-        printf(": \n");
-        imprimir_matriz(TD,n-1,n-1);
+        // printf("Esta es la submatriz TD para j =");
+        // printf("%5d  ", j);
+        // printf(": \n");
+        // imprimir_matriz(TD,n-1,n-1);
         determinant = determinant + (pow(-1, j)*X[j]*determinantTwo(TD,n-1));
         
         delete [] TD;
@@ -263,4 +268,56 @@ float determinantTwo(float X[], int n){
   }
   
   return determinant; 
+}
+
+void invMat(float X[], int n){
+  float* IN = new float[n*n];
+  float* ADJ = new float[n*n];
+
+  for (int i = 0; i < n; i++){
+    for (int j = 0; j < n; j++){
+      float* SUBM = new float[(n-1)*(n-1)];
+      int x = 0; 
+        for(int l=0; l<n; l++){
+          int y = 0;
+          if((l == i))
+          continue;
+            for(int m=0; m<n; m++){
+            if((m == j))
+            continue;
+              SUBM[x*(n-1) + y ] = X[l*n + m ];
+            y++;
+            }
+            x++;
+        }
+
+        
+      //   ADJ[i*n + j] = 1;
+
+  printf("Esta es su matriz submatriz SUBM ");
+  printf("con i =");
+      printf("%2d", i);
+  printf("y j =");
+      printf("%2d", j);
+  printf(" \n");
+  imprimir_matriz(SUBM, n-1, n-1);
+  printf(" \n");
+
+
+      // float deterSUB = determinantTwo[SUBM,(n-1)];
+      // printf("Este es el determinante de la submatrix");
+      // printf("%5.2f  ", deterSUB);
+
+        delete [] SUBM;
+        SUBM = NULL; 
+    }
+  }
+
+  // printf("Esta es su matriz adjunta ADJ: \n");
+  // imprimir_matriz(ADJ, n, n);
+  
+  delete [] IN;
+  delete [] ADJ;
+  IN = NULL; 
+  ADJ = NULL; 
 }
