@@ -303,10 +303,10 @@ void invMat(float X[], int n){
   imprimir_matriz(SUBM, n-1, n-1);
   printf(" \n");
 
-
-      // float deterSUB = determinantTwo[SUBM,(n-1)];
-      // printf("Este es el determinante de la submatrix");
-      // printf("%5.2f  ", deterSUB);
+  float determinante = determinantTwo(SUBM,n-1);
+  printf("El determinante de SUBM es:");
+  printf("%5.2f  ", determinante);
+  printf("\n");
 
         delete [] SUBM;
         SUBM = NULL; 
