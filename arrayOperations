@@ -292,7 +292,6 @@ void invMat(float X[], int n){
         }
 
         
-      //   ADJ[i*n + j] = 1;
 
   printf("Esta es su matriz submatriz SUBM ");
   printf("con i =");
@@ -308,13 +307,27 @@ void invMat(float X[], int n){
   printf("%5.2f  ", determinante);
   printf("\n");
 
+
+        ADJ[i*n + j] = pow(-1, 2 + i + j) * determinante;
+
         delete [] SUBM;
         SUBM = NULL; 
     }
   }
 
-  // printf("Esta es su matriz adjunta ADJ: \n");
+  printf("Esta es su matriz adjunta ADJ: \n");
   // imprimir_matriz(ADJ, n, n);
+  for(int i=0;i<n;i++){
+    for(int j=0;j<n;j++){
+      // printf("%5.2f  ", X[(i*n) + j]);
+      printf("%12.2f  ", ADJ[(i*n) + j]);
+    }
+    printf("\n");
+  }
+
+  
+  printf("Esta es la transpuesta de ADJ: \n");
+  transMat(ADJ, n, n );
   
   delete [] IN;
   delete [] ADJ;
