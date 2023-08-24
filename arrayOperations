@@ -16,6 +16,8 @@ float determinantTwo(float X[], int n);
 
 float* adjMat(float X[], int n);
 
+float* divEscMat(float X[], float divisor, int n, int m);
+
 int main(){
     int k = 3; // meses del ano
     int m = 2; // numero total de anos
@@ -130,6 +132,24 @@ int main(){
     printf("\n");
   }
 
+
+  printf("Esta es la inversa de D: \n");
+  float* invMat = divEscMat(transAdjD, determinante, n, n);
+  for(int i=0;i<n;i++){
+    for(int j=0;j<n;j++){
+      printf("%12.2f  ", invMat[(i*n) + j]);
+    }
+    printf("\n");
+  }
+
+  printf("Aca corroboramos que la inversa si es al multiplical D por invD: \n");
+  float* unitMat = mulMat(D,invMat,nD, nD, nD);
+ for(int i=0;i<nD;i++){
+    for(int j=0;j<nD;j++){
+      printf("%12.2f  ", unitMat[(i*nD) + j]);
+    }
+    printf("\n");
+  }
   printf("---------------------------------------");
 
 
@@ -193,6 +213,7 @@ int main(){
   imprimir_matriz(transAB, m, n);   
 
 
+
     // liberamos memoria y evitamos fugas:
       delete [] Z;
       delete [] Y;
@@ -208,9 +229,9 @@ int main(){
       delete [] transAB; 
       delete [] AdjD; 
       delete [] transAdjD;
-
-
-      
+      delete [] invMat;
+      delete [] unitMat; 
+            
       Z = NULL; 
       Y = NULL;
       X = NULL;
@@ -224,7 +245,9 @@ int main(){
       transDatosPrueba = NULL;
       transAB = NULL;
       AdjD = NULL; 
-      transAdjD = NULL; 
+      transAdjD = NULL;
+      invMat = NULL;  
+      unitMat = NULL; 
 }
 
 // Funcion que imprime una mnatriz mxn cin m columnas y n filas
@@ -379,4 +402,17 @@ float* adjMat(float X[], int n){
   // ADJ = NULL; 
 
   return ADJ;
+}
+
+
+float* divEscMat(float X[], float divisor, int n, int m){
+  float* newMat = new float[n*m];
+
+  for(int i=0; i<n; i++){
+    for(int j=0; j<m; j++){
+      newMat[(n*i) + j] = X[(n*i) + j] / divisor;
+    }
+  }
+
+  return newMat;
 }
