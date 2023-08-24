@@ -10,7 +10,7 @@ void imprimir_matriz(float X[], int m, int n );
 
 float* mulMat(float X[],float Y[], int xr, int xy, int yc );
 
-void transMat(float X[], int m, int n );
+float* transMat(float X[], int m, int n );
 
 float determinantTwo(float X[], int n);
 
@@ -152,9 +152,15 @@ int main(){
 
 
   printf("Esta es la transpuesta de B: \n");
-  transMat(B, n, m );
+  float* transB = transMat(B, n, m );
+  imprimir_matriz(transB, m, n);
+
+
+  printf("Esta es la matriz de datosPruba: \n");
+  imprimir_matriz(datosPrueba, 3, 12);
   printf("Esta es la transpuesta de datosPruba: \n");
-  transMat(datosPrueba, 3, 12 );
+  float* transDatosPrueba = transMat(datosPrueba, 3, 12 );
+  imprimir_matriz(transDatosPrueba, 12, 3);
   // printf("Esta es la transpuesta de A: \n");
   // transMat(A, n, n );
   // printf("Esta es la transpuesta de datosIse 2x3: \n");
@@ -163,7 +169,10 @@ int main(){
   // mulMat(A,B, n, n, m);
   float* AB = mulMat(A,B, n, n, m);
   imprimir_matriz(AB, n, m); 
-  transMat(AB, n, m);    
+  
+  printf("Esta es la transpuesta de A*B: \n");
+  float* transAB = transMat(AB, n, m);  
+  imprimir_matriz(transAB, m, n);   
 
 
     // liberamos memoria y evitamos fugas:
@@ -176,6 +185,11 @@ int main(){
       delete [] T;
       delete [] D;
       delete [] AB; 
+      delete [] transB;
+      delete [] transDatosPrueba;
+      delete [] transAB; 
+
+
       
       Z = NULL; 
       Y = NULL;
@@ -185,6 +199,10 @@ int main(){
       M = NULL;
       T = NULL;
       D = NULL; 
+      AB = NULL;
+      transB = NULL;
+      transDatosPrueba = NULL;
+      transAB = NULL;
 }
 
 // Funcion que imprime una mnatriz mxn cin m columnas y n filas
@@ -218,9 +236,9 @@ float* mulMat(float X[],float Y[], int xr, int xy, int yc ){
 
 
 // Funcion para transponer una matriz cualquiera de tamano "xr X xc"
-void transMat(float X[], int m, int n ){
-  printf("\nEsta es su matriz:\n \n");
-  imprimir_matriz(X,m,n);
+float* transMat(float X[], int m, int n ){
+  // printf("\nEsta es su matriz:\n \n");
+  // imprimir_matriz(X,m,n);
   
   float* TM =new float[m*n];
   for(int i=0; i<m; i++){
@@ -231,11 +249,12 @@ void transMat(float X[], int m, int n ){
     
   }
 // imprimimos TM en pantalla:
-printf("Esta es su matriz traspuesta T: \n");
-  imprimir_matriz(TM,n,m);
+// printf("Esta es su matriz traspuesta T: \n");
+//   imprimir_matriz(TM,n,m);
 
-  delete [] TM;
-  TM = NULL;
+  // delete [] TM;
+  // TM = NULL;
+  return TM;
 }
 
 
