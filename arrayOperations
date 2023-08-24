@@ -1,3 +1,7 @@
+#include <iostream>
+#include <cstdio>
+#include <fstream>
+#include <cmath>
 #include <vector>
 
 using namespace std; 
@@ -10,7 +14,7 @@ float* transMat(float X[], int m, int n );
 
 float determinantTwo(float X[], int n);
 
-float* invMat(float X[], int n);
+float* adjMat(float X[], int n);
 
 int main(){
     int k = 3; // meses del ano
@@ -107,7 +111,7 @@ int main(){
   printf("\n");
 
   printf("Aca calculamos la adjunta de D:");
-  float* AdjD = invMat(D, nD);  
+  float* AdjD = adjMat(D, nD);  
 
   printf("Esta es su matriz adjunta ADJ: XD \n");
   for(int i=0;i<n;i++){
@@ -312,8 +316,8 @@ float determinantTwo(float X[], int n){
   return determinant; 
 }
 
-float* invMat(float X[], int n){
-  float* IN = new float[n*n];
+float* adjMat(float X[], int n){
+
   float* ADJ = new float[n*n];
 
   for (int i = 0; i < n; i++){
@@ -369,9 +373,9 @@ float* invMat(float X[], int n){
   // printf("Esta es la transpuesta de ADJ: \n");
   // transMat(ADJ, n, n );
   
-  delete [] IN;
+
   // delete [] ADJ;
-  IN = NULL; 
+
   // ADJ = NULL; 
 
   return ADJ;
