@@ -8,7 +8,7 @@ using namespace std;
 
 void imprimir_matriz(float X[], int m, int n );
 
-void mulMat(float X[],float Y[], int xr, int xy, int yc );
+float* mulMat(float X[],float Y[], int xr, int xy, int yc );
 
 void transMat(float X[], int m, int n );
 
@@ -17,8 +17,8 @@ float determinantTwo(float X[], int n);
 void invMat(float X[], int n);
 
 int main(){
-    int k = 5; // meses del ano
-    int m = 1; // numero total de anos
+    int k = 3; // meses del ano
+    int m = 2; // numero total de anos
     int n = m * k;
     int nD = 6;
 
@@ -159,8 +159,11 @@ int main(){
   // transMat(A, n, n );
   // printf("Esta es la transpuesta de datosIse 2x3: \n");
   // transMat(datosISE, 2, 3 );
-  printf("Esta es la multiplicacion A*C: \n");
-  mulMat(A,B, n, n, m);
+  printf("Esta es la multiplicacion A*B: \n");
+  // mulMat(A,B, n, n, m);
+  float* AB = mulMat(A,B, n, n, m);
+  imprimir_matriz(AB, n, m); 
+  transMat(AB, n, m);    
 
 
     // liberamos memoria y evitamos fugas:
@@ -172,6 +175,7 @@ int main(){
       delete [] M;
       delete [] T;
       delete [] D;
+      delete [] AB; 
       
       Z = NULL; 
       Y = NULL;
@@ -194,7 +198,7 @@ void imprimir_matriz(float X[], int m, int n ){
   
 }
 
-void mulMat(float X[],float Y[], int xr, int xy, int yc ){
+float* mulMat(float X[],float Y[], int xr, int xy, int yc ){
   float* MM =new float[xr*yc];
     for(int i=0; i<xr; i++){
     for(int j=0; j<yc; j++){
@@ -205,10 +209,11 @@ void mulMat(float X[],float Y[], int xr, int xy, int yc ){
         MM[(i*yc) + j] = accumulator;
       }
     }
-    imprimir_matriz(MM, xr, yc); 
-    transMat(MM, xr, yc);    
-    delete [] MM;
-    MM = NULL; 
+    // imprimir_matriz(MM, xr, yc); 
+    // transMat(MM, xr, yc);    
+    // delete [] MM;
+    // MM = NULL; 
+    return MM; 
 }
 
 
