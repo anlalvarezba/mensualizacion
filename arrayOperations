@@ -1,7 +1,3 @@
-#include <iostream>
-#include <cstdio>
-#include <fstream>
-#include <cmath>
 #include <vector>
 
 using namespace std; 
@@ -14,7 +10,7 @@ float* transMat(float X[], int m, int n );
 
 float determinantTwo(float X[], int n);
 
-void invMat(float X[], int n);
+float* invMat(float X[], int n);
 
 int main(){
     int k = 3; // meses del ano
@@ -111,7 +107,25 @@ int main(){
   printf("\n");
 
   printf("Aca calculamos la adjunta de D:");
-  invMat(D, nD);  
+  float* AdjD = invMat(D, nD);  
+
+  printf("Esta es su matriz adjunta ADJ: XD \n");
+  for(int i=0;i<n;i++){
+    for(int j=0;j<n;j++){
+      printf("%12.2f  ", AdjD[(i*n) + j]);
+    }
+    printf("\n");
+  }
+
+  printf("Esta es la transpuesta de ADJ: \n");
+  float* transAdjD= transMat(AdjD, n, n );
+  for(int i=0;i<n;i++){
+    for(int j=0;j<n;j++){
+      printf("%12.2f  ", transAdjD[(i*n) + j]);
+    }
+    printf("\n");
+  }
+
   printf("---------------------------------------");
 
 
@@ -188,6 +202,8 @@ int main(){
       delete [] transB;
       delete [] transDatosPrueba;
       delete [] transAB; 
+      delete [] AdjD; 
+      delete [] transAdjD;
 
 
       
@@ -203,6 +219,8 @@ int main(){
       transB = NULL;
       transDatosPrueba = NULL;
       transAB = NULL;
+      AdjD = NULL; 
+      transAdjD = NULL; 
 }
 
 // Funcion que imprime una mnatriz mxn cin m columnas y n filas
@@ -294,7 +312,7 @@ float determinantTwo(float X[], int n){
   return determinant; 
 }
 
-void invMat(float X[], int n){
+float* invMat(float X[], int n){
   float* IN = new float[n*n];
   float* ADJ = new float[n*n];
 
@@ -339,22 +357,22 @@ void invMat(float X[], int n){
     }
   }
 
-  printf("Esta es su matriz adjunta ADJ: \n");
-  // imprimir_matriz(ADJ, n, n);
-  for(int i=0;i<n;i++){
-    for(int j=0;j<n;j++){
-      // printf("%5.2f  ", X[(i*n) + j]);
-      printf("%12.2f  ", ADJ[(i*n) + j]);
-    }
-    printf("\n");
-  }
+  // printf("Esta es su matriz adjunta ADJ: \n");
+  // for(int i=0;i<n;i++){
+  //   for(int j=0;j<n;j++){
+  //     printf("%12.2f  ", ADJ[(i*n) + j]);
+  //   }
+  //   printf("\n");
+  // }
 
   
-  printf("Esta es la transpuesta de ADJ: \n");
-  transMat(ADJ, n, n );
+  // printf("Esta es la transpuesta de ADJ: \n");
+  // transMat(ADJ, n, n );
   
   delete [] IN;
-  delete [] ADJ;
+  // delete [] ADJ;
   IN = NULL; 
-  ADJ = NULL; 
+  // ADJ = NULL; 
+
+  return ADJ;
 }
