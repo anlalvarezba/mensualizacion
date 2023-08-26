@@ -19,35 +19,52 @@ float* adjMat(float X[], int n);
 float* divEscMat(float X[], float divisor, int n, int m);
 
 int main(){
-    int k = 3; // meses del ano
-    int m = 2; // numero total de anos
+    int k = 3; // meses del ano (meses por periodo 3, es un trimestre)
+    int m = 8; // numero total de anos (de trimestres, en este caso 8, se tiene los datos para 2 anos)
     int n = m * k;
-    int nD = 6;
-
+    
     float* Z =new float [n]; // se declara la serie de datos del ISE
     float* Y =new float [m]; // se declara la serie de datos del PIB disponible
     float* X =new float [n]; // se declara la serie de datos del PIB mensualizado
 
-    float datosISE[] = {2.0, 4.0, 8.0, 10.0, 12.0, 14.0};
-    float datosPIB[] = {5.0, 6.0, 7.0};
+    float datosISE[] = {
+        60.1,
+        61.6,
+        62.2,
+        63.1,
+        62.7,
+        63.6,
+        63.9,
+        65.2,
+        65.8,
+        66.0,
+        68.6,
+        73.7,
+        62.6,
+        64.7,
+        66.8,
+        64.4,
+        66.9,
+        66.7,
+        68.5,
+        69.8,
+        71.2,
+        71.1,
+        74.5,
+        77.4 };
+    float datosPIB[] = {
+        121.278,
+        125.664,
+        129.103,
+        138.808,
+        128.999,
+        132.349,
+        138.998,
+        149.088 };
 
-    float datosPrueba[] = 
-    {
-        1,  3,  5,  9,  1, -8,
-        1,  3,  1,  7,  2,  7,
-        4,  3,  9,  7,  3,  2,
-        5,  2,  0,  9,  4,  1,
-        1,  2,  3,  4,  5,  1,
-       -6,  1, -3,  2,  1,  7
-    };
     
 	  float* A =new float [n*n]; // Matriz A inversa del problema de minimizacion
-    float* B =new float[n*m];
-
-    float* M =new float[n*m]; // Matriz multiplicacion de A y C: A*C
-    float* T =new float[m*n]; // Matriz transpuesta de C
-
-    float* D = new float[nD*nD];
+    float* B =new float[n*m]; //Matriz de ceros y unos
 ///////////////////////// Llenando de elementos los arreglos anteriores:
 
     // se llena el vector Z:
@@ -94,63 +111,77 @@ int main(){
       }
     }
 
+
+    float* AB = mulMat(A,B, n, n, m); //Matriz resultado de la multiplicacion de A inversa y B
+    float* transB = transMat(B, n, m ); //Matriz transpuesta de B
+    float* BtAB = mulMat(transB, AB, m, n, m); //Matriz resultado de la multiplicacion de B transpuesta y A inversa B
+    float* adjBtAB = adjMat(BtAB, m); //Matriz adjunta de BtAB
+    float* transAdjBtAB = transMat(adjBtAB, m, m); //Matriz transpuesta de adjBtAB
+    
+    float determinanteBtAB = determinantTwo(BtAB, m); //determinante de la matriz BtAB
+    
+    float* invBtAB = divEscMat(transAdjBtAB, determinanteBtAB, m, m); //Matriz inversa de la matriz BtAB
+    float* C = mulMat(AB, invBtAB, n, m, m); //Matriz resultado de la multiplicacion de A inversa B y invBtAB
+
+    float* BtZ = mulMat(transB, Z, m, n, 1);
+
     // se llena la matriz D:
-    int sumaD = 0;
-    for(int i=0; i<nD; i++){
-      for(int j=0; j<nD; j++){
-          D[(i*nD) + j] = datosPrueba[sumaD];
-          sumaD++; 
-      }
-    }
+    // int sumaD = 0;
+    // for(int i=0; i<nD; i++){
+    //   for(int j=0; j<nD; j++){
+    //       D[(i*nD) + j] = datosPrueba[sumaD];
+    //       sumaD++; 
+    //   }
+    // }
 
 
-  printf("Esta es la matriz D: \n");
-  imprimir_matriz(D, nD, nD);
-  printf("\n");
-  float determinante = determinantTwo(D,nD);
-  printf("El determinante de D es:");
-  printf("%5.2f  ", determinante);
-  printf("\n");
+  // printf("Esta es la matriz D: \n");
+  // imprimir_matriz(D, nD, nD);
+  // printf("\n");
+  // float determinante = determinantTwo(D,nD);
+  // printf("El determinante de D es:");
+  // printf("%5.2f  ", determinante);
+  // printf("\n");
 
-  printf("Aca calculamos la adjunta de D:");
-  float* AdjD = adjMat(D, nD);  
+//   printf("Aca calculamos la adjunta de D:");
+//   float* AdjD = adjMat(D, nD);  
 
-  printf("Esta es su matriz adjunta ADJ: XD \n");
-  for(int i=0;i<n;i++){
-    for(int j=0;j<n;j++){
-      printf("%12.2f  ", AdjD[(i*n) + j]);
-    }
-    printf("\n");
-  }
+//   printf("Esta es su matriz adjunta ADJ: XD \n");
+//   for(int i=0;i<n;i++){
+//     for(int j=0;j<n;j++){
+//       printf("%12.2f  ", AdjD[(i*n) + j]);
+//     }
+//     printf("\n");
+//   }
 
-  printf("Esta es la transpuesta de ADJ: \n");
-  float* transAdjD= transMat(AdjD, n, n );
-  for(int i=0;i<n;i++){
-    for(int j=0;j<n;j++){
-      printf("%12.2f  ", transAdjD[(i*n) + j]);
-    }
-    printf("\n");
-  }
+//   printf("Esta es la transpuesta de ADJ: \n");
+//   float* transAdjD= transMat(AdjD, n, n );
+//   for(int i=0;i<n;i++){
+//     for(int j=0;j<n;j++){
+//       printf("%12.2f  ", transAdjD[(i*n) + j]);
+//     }
+//     printf("\n");
+//   }
 
 
-  printf("Esta es la inversa de D: \n");
-  float* invMat = divEscMat(transAdjD, determinante, n, n);
-  for(int i=0;i<n;i++){
-    for(int j=0;j<n;j++){
-      printf("%12.2f  ", invMat[(i*n) + j]);
-    }
-    printf("\n");
-  }
+//   printf("Esta es la inversa de D: \n");
+//   float* invMat = divEscMat(transAdjD, determinante, n, n);
+//   for(int i=0;i<n;i++){
+//     for(int j=0;j<n;j++){
+//       printf("%12.2f  ", invMat[(i*n) + j]);
+//     }
+//     printf("\n");
+//   }
 
-  printf("Aca corroboramos que la inversa si es al multiplical D por invD: \n");
-  float* unitMat = mulMat(D,invMat,nD, nD, nD);
- for(int i=0;i<nD;i++){
-    for(int j=0;j<nD;j++){
-      printf("%12.2f  ", unitMat[(i*nD) + j]);
-    }
-    printf("\n");
-  }
-  printf("---------------------------------------");
+//   printf("Aca corroboramos que la inversa si es al multiplical D por invD: \n");
+//   float* unitMat = mulMat(D,invMat,nD, nD, nD);
+//  for(int i=0;i<nD;i++){
+//     for(int j=0;j<nD;j++){
+//       printf("%12.2f  ", unitMat[(i*nD) + j]);
+//     }
+//     printf("\n");
+//   }
+//   printf("---------------------------------------");
 
 
 
@@ -189,29 +220,32 @@ int main(){
     imprimir_matriz(B, n, m);
 
 
-  printf("Esta es la transpuesta de B: \n");
-  float* transB = transMat(B, n, m );
-  imprimir_matriz(transB, m, n);
+  // printf("Esta es la transpuesta de B: \n");
+  // imprimir_matriz(transB, m, n);
 
 
-  printf("Esta es la matriz de datosPruba: \n");
-  imprimir_matriz(datosPrueba, 3, 12);
-  printf("Esta es la transpuesta de datosPruba: \n");
-  float* transDatosPrueba = transMat(datosPrueba, 3, 12 );
-  imprimir_matriz(transDatosPrueba, 12, 3);
+  // printf("Esta es la matriz de datosPruba: \n");
+  // imprimir_matriz(datosPrueba, 3, 12);
+  // printf("Esta es la transpuesta de datosPruba: \n");
+  // float* transDatosPrueba = transMat(datosPrueba, 3, 12 );
+  // imprimir_matriz(transDatosPrueba, 12, 3);
   // printf("Esta es la transpuesta de A: \n");
   // transMat(A, n, n );
   // printf("Esta es la transpuesta de datosIse 2x3: \n");
   // transMat(datosISE, 2, 3 );
-  printf("Esta es la multiplicacion A*B: \n");
-  // mulMat(A,B, n, n, m);
-  float* AB = mulMat(A,B, n, n, m);
-  imprimir_matriz(AB, n, m); 
+  // printf("Esta es la multiplicacion A*B: \n");
   
-  printf("Esta es la transpuesta de A*B: \n");
-  float* transAB = transMat(AB, n, m);  
-  imprimir_matriz(transAB, m, n);   
+  // imprimir_matriz(AB, n, m); 
+  
+  // printf("Esta es la transpuesta de A*B: \n");
+  // float* transAB = transMat(AB, n, m);  
+  // imprimir_matriz(transAB, m, n);   
 
+  printf("Esta es la matriz C: \n");
+  imprimir_matriz(C, n, m); 
+
+  printf("Esta es la matriz BtZ: \n");
+  imprimir_matriz(BtZ, m, 1);
 
 
     // liberamos memoria y evitamos fugas:
@@ -220,34 +254,46 @@ int main(){
       delete [] X;
       delete [] A;
       delete [] B;
-      delete [] M;
-      delete [] T;
-      delete [] D;
+      // delete [] M;
+      // delete [] T;
+      // delete [] D;
       delete [] AB; 
       delete [] transB;
-      delete [] transDatosPrueba;
-      delete [] transAB; 
-      delete [] AdjD; 
-      delete [] transAdjD;
-      delete [] invMat;
-      delete [] unitMat; 
+      delete [] BtAB; 
+      delete [] adjBtAB;
+      delete [] transAdjBtAB;
+      delete [] invBtAB;
+      delete [] C;  
+      delete [] BtZ;
+      // delete [] transDatosPrueba;
+      // delete [] transAB; 
+      // delete [] AdjD; 
+      // delete [] transAdjD;
+      // delete [] invMat;
+      // delete [] unitMat; 
             
       Z = NULL; 
       Y = NULL;
       X = NULL;
       A = NULL;
       B = NULL;
-      M = NULL;
-      T = NULL;
-      D = NULL; 
+      // M = NULL;
+      // T = NULL;
+      // D = NULL; 
       AB = NULL;
       transB = NULL;
-      transDatosPrueba = NULL;
-      transAB = NULL;
-      AdjD = NULL; 
-      transAdjD = NULL;
-      invMat = NULL;  
-      unitMat = NULL; 
+      BtAB = NULL; 
+      adjBtAB = NULL;
+      transAdjBtAB = NULL;
+      invBtAB = NULL;  
+      C = NULL; 
+      BtZ = NULL; 
+      // transDatosPrueba = NULL;
+      // transAB = NULL;
+      // AdjD = NULL; 
+      // transAdjD = NULL;
+      // invMat = NULL;  
+      // unitMat = NULL; 
 }
 
 // Funcion que imprime una mnatriz mxn cin m columnas y n filas
