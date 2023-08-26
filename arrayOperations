@@ -154,10 +154,25 @@ int main(){
     printf("Esta es la matriz A^-1 de la minimizacion: \n");
     imprimir_matriz(A, n, n);
 
-    //imprimimos C en pantalla:
+    //imprimimos B en pantalla:
     printf("Esta es la matriz B del Lagrangiano: \n");
     imprimir_matriz(B, n, m);
 
+    //imprimimos AB en pantalla:
+    printf("Esta es la matriz AB: \n");
+    imprimir_matriz(AB, n, m);
+
+    //imprimimos BtranspuestaAB en pantalla:
+    printf("Esta es la matriz BtranspuestaAB: \n");
+    imprimir_matriz(BtAB, m, m);
+
+    //imprimimos la inversa de BtranspuestaAB en pantalla:
+    printf("Esta es la matriz inversa de BtranspuestaAB: \n");
+    imprimir_matriz(invBtAB, m, m);
+
+  float* comprobacioninvBtAB = mulMat(invBtAB, BtAB, m, m, m);
+  printf("Esta es la comprobacion de la matriz inversa de BtranspuestaAB: \n");
+  imprimir_matriz(comprobacioninvBtAB, m, m);
 
   printf("Esta es la matriz C: \n");
   imprimir_matriz(C, n, m); 
@@ -190,7 +205,7 @@ int main(){
       delete [] R; 
       delete [] CR;
       delete [] X; 
-            
+      delete [] comprobacioninvBtAB; 
       Z = NULL; 
       Y = NULL;
       A = NULL;
@@ -206,6 +221,7 @@ int main(){
       R = NULL;  
       CR = NULL; 
       X = NULL; 
+      comprobacioninvBtAB = NULL; 
 }
 
 // Funcion que imprime una mnatriz mxn cin m columnas y n filas
