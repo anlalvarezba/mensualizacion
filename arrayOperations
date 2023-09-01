@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cmath>
 #include <vector>
+#include <chrono>
 
 using namespace std; 
 
@@ -22,8 +23,12 @@ float* restVect(float X[], float Y[], int n);
 float* sumVect(float X[], float Y[], int n);
 
 int main(){
+
+// Start measuring time
+auto start = std::chrono::high_resolution_clock::now();
+
     int k = 3; // meses del ano (meses por periodo 3, es un trimestre)
-    int m = 17; // numero total de anos (de trimestres, en este caso 8, se tiene los datos para 2 anos)
+    int m = 68; // numero total de anos (de trimestres, en este caso 8, se tiene los datos para 2 anos)
     int n = m * k;
     
     float* Z =new float [n]; // se declara la serie de datos del ISE
@@ -429,6 +434,10 @@ float datosPIB[] = {
     imprimir_matriz(invBtAB, m, m);
 
   float* comprobacioninvBtAB = mulMat(invBtAB, BtAB, m, m, m);
+
+  // Stop measuring time and calculate the elapsed time
+  auto stop = std::chrono::high_resolution_clock::now();
+
   printf("Esta es la comprobacion de la matriz inversa de BtranspuestaAB: \n");
   imprimir_matriz(comprobacioninvBtAB, m, m);
 
@@ -446,6 +455,9 @@ float datosPIB[] = {
 
   printf("Esta es el vector X: \n");
   imprimir_matriz(X, n, 1);
+
+  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start); 
+  printf("Time medido: %.3f segundos.\n", duration.count() * 1e-9);
 
     // liberamos memoria y evitamos fugas:
       delete [] Z;
