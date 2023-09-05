@@ -1,40 +1,27 @@
-#include <iostream>
-#include <cstdio>
-#include <fstream>
-#include <cmath>
-#include <vector>
-#include <chrono>
+#include<iostream>
+#include<Eigen/Dense>
+#include<vector>
+#include<chrono>
 
-using namespace std; 
+using namespace std;
+using namespace Eigen;
 
-void imprimir_matriz(float X[], int m, int n );
 
-float* mulMat(float X[],float Y[], int xr, int xy, int yc );
+void imprimir_matriz(const MatrixXf& X);
 
-float* transMat(float X[], int m, int n );
-
-float determinantTwo(float X[], int n);
-
-float* adjMat(float X[], int n);
-
-float* divEscMat(float X[], float divisor, int n, int m);
-
-float* restVect(float X[], float Y[], int n);
-float* sumVect(float X[], float Y[], int n);
-
-int main(){
-
+int main()
+{
 // Start measuring time
-auto start = std::chrono::high_resolution_clock::now();
+    auto start = chrono::high_resolution_clock::now();
 
-    int k = 3; // meses del ano (meses por periodo 3, es un trimestre)
-    int m = 68; // numero total de anos (de trimestres, en este caso 8, se tiene los datos para 2 anos)
+    int k = 3; // meses por período (trimestres)
+    int m = 72; // número total de años (trimestres, en este caso 8, datos para 2 años)
     int n = m * k;
-    
-    float* Z =new float [n]; // se declara la serie de datos del ISE
-    float* Y =new float [m]; // se declara la serie de datos del PIB disponible
 
-//////////////////////////////ANO 1
+    VectorXf Z(n); // serie de datos del ISE
+    VectorXf Y(m); // serie de datos del PIB disponible
+
+    //data:
 float datosISE[] = {
   60.1,         //ano 2005
   61.6,         //ano 2005
@@ -253,7 +240,6 @@ float datosISE[] = {
   125.1,                //ano 2022  
   133.6,                //ano 2022  
 };
-
 float datosPIB[] = {
   121278.0,     //ano 2005
   125664.0,     //ano 2005
@@ -329,315 +315,139 @@ float datosPIB[] = {
   257792.0,         //ano 2022
 };
 
+	float* Aold =new float [n*n]; // Matriz A inversa del problema de minimizacion
+    float* Bold =new float[n*m]; //Matriz de ceros y unos
 
-	  float* A =new float [n*n]; // Matriz A inversa del problema de minimizacion
-    float* B =new float[n*m]; //Matriz de ceros y unos
-///////////////////////// Llenando de elementos los arreglos anteriores:
 
-    // se llena el vector Z:
-    for(int i=0; i<n; i++)
-    {
-      Z[i] = datosISE[i];
+    // Llenar los vectores Z y Y aquí...
+    // Fill the Eigen vector with the data
+    for (int i = 0; i < n; ++i) {
+        Z(i) = datosISE[i];
     }
 
-    // se llena el vector Y:
-    for(int i=0; i<m; i++)
-    {
-      Y[i] = datosPIB[i];
+    for (int i = 0; i < m; ++i) {
+        Y(i) = datosPIB[i];
     }
 
-    // se llena la matriz A:
+
+    ////////////////////////////
+
+    // MatrixXf A = MatrixXf::Zero(n, n);
+    // MatrixXf B = MatrixXf::Zero(n, m);
+
+    // Llenar las matrices A y B aquí...
+// se llena la matriz Aold:
     for(int i=0; i<n; i++){
       for(int j=0; j<n; j++){
         if(i <= j ){
-          A[(i*n) + j] = i + 1; 
+          Aold[(i*n) + j] = i + 1; 
         } else {
-          A[(i*n) + j] = j + 1;
+          Aold[(i*n) + j] = j + 1;
         }
       }
     }
 
 
-     // se llena la matriz B:
-    int count = 0; 
-    int change = 0; 
-    for(int i=0; i<n; i++){
-      if(count < k){
-      ++ count;
-        for(int j=0; j<m; j++){
-          if(j == change){
-            B[i*m + j] =  1;
-          } else {
-            B[i*m + j] =  0;
-          }
+     // se llena la matriz Bold:
+   int count = 0;
+    int change = 0;
+
+    for (int i = 0; i < n; i++) {
+        if (count < k) {
+            ++count;
+            for (int j = 0; j < m; j++) {
+                if (j == change) {
+                    Bold[i * m + j] = 1.0f;
+                } else {
+                    Bold[i * m + j] = 0.0f;
+                }
+            }
+        } else {
+            change += 1;
+            count = 0;
+            i = i - 1;
         }
-      } else {
-        change += 1;
-        count = 0; 
-        i = i - 1; 
-      }
     }
 
-
-    float* AB = mulMat(A,B, n, n, m); //Matriz resultado de la multiplicacion de A inversa y B
-    float* transB = transMat(B, n, m ); //Matriz transpuesta de B
-    float* BtAB = mulMat(transB, AB, m, n, m); //Matriz resultado de la multiplicacion de B transpuesta y A inversa B
-    float* adjBtAB = adjMat(BtAB, m); //Matriz adjunta de BtAB
-    float* transAdjBtAB = transMat(adjBtAB, m, m); //Matriz transpuesta de adjBtAB
-    
-    float determinanteBtAB = determinantTwo(BtAB, m); //determinante de la matriz BtAB
-    
-    float* invBtAB = divEscMat(transAdjBtAB, determinanteBtAB, m, m); //Matriz inversa de la matriz BtAB
-    float* C = mulMat(AB, invBtAB, n, m, m); //Matriz resultado de la multiplicacion de A inversa B y invBtAB
-
-    float* BtZ = mulMat(transB, Z, m, n, 1);
-    float* R = restVect(Y, BtZ, m);
-    float* CR = mulMat(C, R, n, m, 1);
-
-    float* X = sumVect(Z, CR, n); // se declara la serie de datos del PIB mensualizado
-
-    // imprimimos Z en pantalla:
-    printf("Este es el vector Z del ISE mensual: \n");
-    for(int j=0; j<n; j++)
-    {
-      printf("%5.2f  ", Z[j]);
-      printf(" \n");
-    }
-
-    // imprimimos Y en pantalla:
-    printf("Este es el vector Y del PIB trimestral: \n");
-    for(int j=0; j<m; j++)
-    {
-      printf("%5.2f  ", Y[j]);
-      printf(" \n");
-    }
-
-
-    // imprimimos A en pantalla:
-    printf("Esta es la matriz A^-1 de la minimizacion: \n");
-    imprimir_matriz(A, n, n);
-
-    //imprimimos B en pantalla:
-    printf("Esta es la matriz B del Lagrangiano: \n");
-    imprimir_matriz(B, n, m);
-
-    //imprimimos AB en pantalla:
-    printf("Esta es la matriz AB: \n");
-    imprimir_matriz(AB, n, m);
-
-    //imprimimos BtranspuestaAB en pantalla:
-    printf("Esta es la matriz BtranspuestaAB: \n");
-    imprimir_matriz(BtAB, m, m);
-
-    //imprimimos la inversa de BtranspuestaAB en pantalla:
-    printf("Esta es la matriz inversa de BtranspuestaAB: \n");
-    imprimir_matriz(invBtAB, m, m);
-
-  float* comprobacioninvBtAB = mulMat(invBtAB, BtAB, m, m, m);
-
-  // Stop measuring time and calculate the elapsed time
-  auto stop = std::chrono::high_resolution_clock::now();
-
-  printf("Esta es la comprobacion de la matriz inversa de BtranspuestaAB: \n");
-  imprimir_matriz(comprobacioninvBtAB, m, m);
-
-  printf("Esta es la matriz C: \n");
-  imprimir_matriz(C, n, m); 
-
-  printf("Esta es el vector BtZ: \n");
-  imprimir_matriz(BtZ, m, 1);
-
-  printf("Esta es el vector R: \n");
-  imprimir_matriz(R, m, 1);
-
-  printf("Esta es el vector CR: \n");
-  imprimir_matriz(CR, m, 1);
-
-  printf("Esta es el vector X: \n");
-  imprimir_matriz(X, n, 1);
-
-  auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(stop - start); 
-  printf("Time medido: %.3f segundos.\n", duration.count() * 1e-9);
-
-    // liberamos memoria y evitamos fugas:
-      delete [] Z;
-      delete [] Y;
-      delete [] A;
-      delete [] B;
-      delete [] AB; 
-      delete [] transB;
-      delete [] BtAB; 
-      delete [] adjBtAB;
-      delete [] transAdjBtAB;
-      delete [] invBtAB;
-      delete [] C;  
-      delete [] BtZ;
-      delete [] R; 
-      delete [] CR;
-      delete [] X; 
-      delete [] comprobacioninvBtAB; 
-      Z = NULL; 
-      Y = NULL;
-      A = NULL;
-      B = NULL;
-      AB = NULL;
-      transB = NULL;
-      BtAB = NULL; 
-      adjBtAB = NULL;
-      transAdjBtAB = NULL;
-      invBtAB = NULL;  
-      C = NULL; 
-      BtZ = NULL;
-      R = NULL;  
-      CR = NULL; 
-      X = NULL; 
-      comprobacioninvBtAB = NULL; 
-}
-
-// Funcion que imprime una mnatriz mxn cin m columnas y n filas
-void imprimir_matriz(float X[], int m, int n ){
-  for(int i=0;i<m;i++){
-    for(int j=0;j<n;j++){
-      printf("%5.2f  ", X[(i*n) + j]);
+ for(int i=0;i<n;i++){
+    for(int j=0;j<m;j++){
+      printf("%5.2f  ", Bold[(i*m) + j]);
     }
     printf("\n");
   }
-  
-}
 
-float* mulMat(float X[],float Y[], int xr, int xy, int yc ){
-  float* MM =new float[xr*yc];
-    for(int i=0; i<xr; i++){
-    for(int j=0; j<yc; j++){
-        float accumulator = 0;
-        for(int k=0; k<xy; k++){
-           accumulator += X[(i*xy) + k]*Y[(k*yc) + j]; 
-        } 
-        MM[(i*yc) + j] = accumulator;
-      }
+    Eigen::Map<Eigen::MatrixXf> A(Aold, n, n);
+    // Eigen::Map<Eigen::MatrixXf> B(Bold, n, m);
+
+    Eigen::MatrixXf B(n, m);
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            B(i, j) = Bold[i * m + j];
+        }
     }
-    return MM; 
-}
+
+    //////////////////////////////
+
+    MatrixXf AB = A * B;
+    MatrixXf transB = B.transpose();
+    MatrixXf BtAB = transB * AB;
+
+    // Calcular el determinante de BtAB
+    float determinanteBtAB = BtAB.determinant();
+
+    MatrixXf invBtAB = BtAB.inverse();
+    MatrixXf C = AB * invBtAB;
+
+    MatrixXf BtZ = transB * Z;
+    VectorXf R = Y - BtZ;
+    VectorXf CR = C * R;
+    VectorXf X = Z + CR;
+
+    // Imprimir resultados
+    cout << "Este es el vector Z del ISE mensual:" << endl;
+    imprimir_matriz(Z);
+
+    cout << "Este es el vector Y del PIB trimestral:" << endl;
+    imprimir_matriz(Y);
+
+    cout << "Esta es la matriz A^-1 de la minimización:" << endl;
+    imprimir_matriz(A);
+
+    cout << "Esta es la matriz B del Lagrangiano:" << endl;
+    imprimir_matriz(B);
+
+    // cout << "Esta es la matriz AB:" << endl;
+    // imprimir_matriz(AB);
+
+    // cout << "Esta es la matriz B transpuesta AB:" << endl;
+    // imprimir_matriz(BtAB);
+
+    // cout << "Esta es la matriz inversa de B transpuesta AB:" << endl;
+    // imprimir_matriz(invBtAB);
+
+    cout << "Este es el vector X resultante:" << endl;
+    imprimir_matriz(X);
+
+    // Stop measuring time and calculate the elapsed time
+    auto stop = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
+    cout << "Tiempo medido: " << duration.count() << " milisegundos." << endl;
 
 
-// Funcion para transponer una matriz cualquiera de tamano "m X n"
-float* transMat(float X[], int m, int n ){
-  
-  float* TM =new float[m*n];
-  for(int i=0; i<m; i++){
-    for(int j=0; j<n; j++){
-      TM[(m*j) + i] = X[(n*i) + j];
-    }
+
+    // Matrix<float, 3,3> matrixA;
+    // matrixA.setZero();
+    // cout<<matrixA<<endl;
+
     
-  }
+      delete [] Aold;
+      delete [] Bold;
+    Aold = NULL;
+    Bold = NULL;
 
-  return TM;
+    return 0; 
 }
 
-
-float determinantTwo(float X[], int n){
-  float determinant = 0; 
-
-  if(n == 2){
-  return (X[0]*X[3] - X[2]*X[1]);
-  } else {
-      for(int j=0; j<n; j++){
-        float* TD = new float[(n-1)*(n-1)];
-        int x = 0; 
-        for(int l=1; l<n; l++){
-          int y = 0; 
-            for(int m=0; m<n; m++){
-            if((m == j))
-            continue;
-              TD[x*(n-1) + y ] = X[l*n + m ];
-            y++;
-            }
-            x++;
-        }
-        
-        determinant = determinant + (pow(-1, j)*X[j]*determinantTwo(TD,n-1));
-        
-        delete [] TD;
-        TD = NULL; 
-      }
-  }
-  
-  return determinant; 
-}
-
-float* adjMat(float X[], int n){
-
-  float* ADJ = new float[n*n];
-
-  for (int i = 0; i < n; i++){
-    for (int j = 0; j < n; j++){
-      float* SUBM = new float[(n-1)*(n-1)];
-      int x = 0; 
-        for(int l=0; l<n; l++){
-          int y = 0;
-          if((l == i))
-          continue;
-            for(int m=0; m<n; m++){
-            if((m == j))
-            continue;
-              SUBM[x*(n-1) + y ] = X[l*n + m ];
-            y++;
-            }
-            x++;
-        }
-
-        
-
-  // printf("Esta es su matriz submatriz SUBM ");
-  // printf("con i =");
-  //     printf("%2d", i);
-  // printf("y j =");
-  //     printf("%2d", j);
-  // printf(" \n");
-  // imprimir_matriz(SUBM, n-1, n-1);
-  // printf(" \n");
-
-  float determinante = determinantTwo(SUBM,n-1);
-  printf("El determinante de SUBM es:");
-  printf("%5.2f  ", determinante);
-  printf("\n");
-
-
-        ADJ[i*n + j] = pow(-1, 2 + i + j) * determinante;
-
-        delete [] SUBM;
-        SUBM = NULL; 
-    }
-  }
-
-  return ADJ;
-}
-
-
-float* divEscMat(float X[], float divisor, int n, int m){
-  float* newMat = new float[n*m];
-
-  for(int i=0; i<n; i++){
-    for(int j=0; j<m; j++){
-      newMat[(n*i) + j] = X[(n*i) + j] / divisor;
-    }
-  }
-
-  return newMat;
-}
-
-float* restVect(float X[], float Y[], int n){
-  float* newVect = new float[n];
-  for(int i=0; i<n; i++){
-    newVect[i] = X[i] - Y[i];
-  }
-  return newVect; 
-}
-
-float* sumVect(float X[], float Y[], int n){
-  float* totalVect = new float[n];
-  for(int i=0; i<n; i++){
-    totalVect[i] = X[i] + Y[i];
-  }
-  return totalVect; 
+void imprimir_matriz(const MatrixXf& X) {
+    cout << X << endl;
 }
