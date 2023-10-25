@@ -135,11 +135,11 @@ def adfuller_test(series, signif=0.05, name='', verbose=False):
     def adjust(val, length= 6): return str(val).ljust(length)
 
     # Print Summary
-    print(f'    Augmented Dickey-Fuller Test on "{name}"', "\n   ", '-'*47)
-    print(f' Null Hypothesis: Data has unit root. Non-Stationary.')
-    print(f' Significance Level    = {signif}')
-    print(f' Test Statistic        = {output["test_statistic"]}')
-    print(f' No. Lags Chosen       = {output["n_lags"]}')
+    # print(f'    Augmented Dickey-Fuller Test on "{name}"', "\n   ", '-'*47)
+    # print(f' Null Hypothesis: Data has unit root. Non-Stationary.')
+    # print(f' Significance Level    = {signif}')
+    # print(f' Test Statistic        = {output["test_statistic"]}')
+    # print(f' No. Lags Chosen       = {output["n_lags"]}')
 
     # Create a summary string
     summary = f'Augmented Dickey-Fuller Test on "{name}"\n'
@@ -151,19 +151,20 @@ def adfuller_test(series, signif=0.05, name='', verbose=False):
 
 
     for key,val in r[4].items():
-        print(f' Critical value {adjust(key)} = {round(val, 3)}')
+        # print(f' Critical value {adjust(key)} = {round(val, 3)}')
         summary += f'Critical value {adjust(key)} = {round(val, 3)}\n'
 
     if p_value <= signif:
-        print(f" => P-Value = {p_value}. Rejecting Null Hypothesis.")
-        print(f" => Series is Stationary.")
+        # print(f" => P-Value = {p_value}. Rejecting Null Hypothesis.")
+        # print(f" => Series is Stationary.")
         summary += f"=> P-Value = {p_value}. Rejecting Null Hypothesis.\n"
         summary += f"=> Series is Stationary.\n"
     else:
-        print(f" => P-Value = {p_value}. Weak evidence to reject the Null Hypothesis.")
-        print(f" => Series is Non-Stationary.") 
+        # print(f" => P-Value = {p_value}. Weak evidence to reject the Null Hypothesis.")
+        # print(f" => Series is Non-Stationary.") 
         summary += f"=> P-Value = {p_value}. Weak evidence to reject the Null Hypothesis.\n"
         summary += f"=> Series is Non-Stationary.\n"
+        summary += f"\n"
 
     return summary
 
@@ -173,7 +174,7 @@ output_strings = []
 for name, column in df_train.items():
     output_string = adfuller_test(column, name=column.name)
     output_strings.append(output_string)
-    # print(output_string)
+    print(output_string)
     print('\n')
 
 # Define the output file path
