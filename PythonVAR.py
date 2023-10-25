@@ -141,18 +141,48 @@ def adfuller_test(series, signif=0.05, name='', verbose=False):
     print(f' Test Statistic        = {output["test_statistic"]}')
     print(f' No. Lags Chosen       = {output["n_lags"]}')
 
+    # Create a summary string
+    summary = f'Augmented Dickey-Fuller Test on "{name}"\n'
+    summary += ' ' + '-'*47 + '\n'
+    summary += f'Null Hypothesis: Data has unit root. Non-Stationary.\n'
+    summary += f'Significance Level    = {signif}\n'
+    summary += f'Test Statistic        = {output["test_statistic"]}\n'
+    summary += f'No. Lags Chosen       = {output["n_lags"]}\n'
+
+
     for key,val in r[4].items():
         print(f' Critical value {adjust(key)} = {round(val, 3)}')
+        summary += f'Critical value {adjust(key)} = {round(val, 3)}\n'
 
     if p_value <= signif:
         print(f" => P-Value = {p_value}. Rejecting Null Hypothesis.")
         print(f" => Series is Stationary.")
+        summary += f"=> P-Value = {p_value}. Rejecting Null Hypothesis.\n"
+        summary += f"=> Series is Stationary.\n"
     else:
         print(f" => P-Value = {p_value}. Weak evidence to reject the Null Hypothesis.")
-        print(f" => Series is Non-Stationary.")    
+        print(f" => Series is Non-Stationary.") 
+        summary += f"=> P-Value = {p_value}. Weak evidence to reject the Null Hypothesis.\n"
+        summary += f"=> Series is Non-Stationary.\n"
+
+    return summary
 
 
 # ADF Test on each column
+output_strings = []
 for name, column in df_train.items():
-    adfuller_test(column, name=column.name)
+    output_string = adfuller_test(column, name=column.name)
+    output_strings.append(output_string)
+    # print(output_string)
     print('\n')
+
+# Define the output file path
+output_file_path3 = "adfuller_test_output.txt"
+
+# Save the output strings to a text file
+with open(output_file_path3, 'w') as file:
+    for output_string in output_strings:
+        file.write(output_string)
+
+# Print a message indicating the file has been saved
+print(f"Output saved to {output_file_path3}")
