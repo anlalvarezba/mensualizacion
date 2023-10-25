@@ -14,6 +14,7 @@ df = pd.read_csv(filepath, parse_dates=['date'], index_col='date')
 print(df.shape)  # (123, 8)
 df.tail()
 
+
 #######Visualize the Time Series
 # Plot
 fig, axes = plt.subplots(nrows=4, ncols=2, dpi=120, figsize=(10,6))
@@ -62,20 +63,96 @@ def grangers_causation_matrix(data, variables, test='ssr_chi2test'):
 causation_matrix = grangers_causation_matrix(df, variables=df.columns)
 
 # Print the causation matrix on the Terminal
-print("Granger Causality Matrix:")
-print(causation_matrix)
+# print("Granger Causality Matrix:")
+# print(causation_matrix)
 
 # Define the file path where you want to save the output
-output_file_path = "granger_causality_matrix.txt"
+output_file_path1 = "granger_causality_matrix.txt"
 
 # Open the file for writing
-with open(output_file_path, 'w') as file:
+with open(output_file_path1, 'w') as file:
     # Write the causation matrix to the file
     file.write("Granger Causality Matrix:\n")
     file.write(causation_matrix.to_string())
 
 # Print a message indicating the file has been saved
-print(f"Output saved to {output_file_path}")
+print(f"Output saved to {output_file_path1}")
 
 
 
+
+
+
+#######Testing Cointegration using Soren Johanssen test
+from statsmodels.tsa.vector_ar.vecm import coint_johansen
+
+def cointegration_test(df, alpha=0.05): 
+    """Perform Johanson's Cointegration Test and Report Summary"""
+    out = coint_johansen(df,-1,5)
+    d = {'0.90':0, '0.95':1, '0.99':2}
+    traces = out.lr1
+    cvts = out.cvt[:, d[str(1-alpha)]]
+    def adjust(val, length= 6): return str(val).ljust(length)
+
+    # Summary
+    print('Name   ::  Test Stat > C(95%)    =>   Signif  \n', '--'*20)
+    for col, trace, cvt in zip(df.columns, traces, cvts):
+        print(adjust(col), ':: ', adjust(round(trace,2), 9), ">", adjust(cvt, 8), ' =>  ' , trace > cvt)
+
+    # Define the output file path
+    output_file_path2 = "cointegration_test_output.txt"
+
+    # Open the file for writing
+    with open(output_file_path2, 'w') as file:
+        # Write the summary to the file
+        file.write('Name   ::  Test Stat > C(95%)    =>   Signif  \n')
+        file.write('--'*20 + '\n')
+        for col, trace, cvt in zip(df.columns, traces, cvts):
+            file.write(adjust(col) + ':: ' + adjust(round(trace, 2), 9) + " > " + adjust(cvt, 8) + ' => ' + str(trace > cvt) + '\n')
+
+    # Print a message indicating the file has been saved
+    print(f"Output saved to {output_file_path2}")
+
+# Call the cointegration_test function
+cointegration_test(df)
+
+########### 8. Split the Series into Training and Testing Data
+nobs = 4
+df_train, df_test = df[0:-nobs], df[-nobs:]
+
+# Check size
+print(df_train.shape)  # (119, 8)
+print(df_test.shape)  # (4, 8)
+
+
+########### 9. Check for Stationarity and Make the Time Series Stationary
+### Usin the Augmented Dickey-Fuller Test (ADF Test) to check stationarity
+def adfuller_test(series, signif=0.05, name='', verbose=False):
+    """Perform ADFuller to test for Stationarity of given series and print report"""
+    r = adfuller(series, autolag='AIC')
+    output = {'test_statistic':round(r[0], 4), 'pvalue':round(r[1], 4), 'n_lags':round(r[2], 4), 'n_obs':r[3]}
+    p_value = output['pvalue'] 
+    def adjust(val, length= 6): return str(val).ljust(length)
+
+    # Print Summary
+    print(f'    Augmented Dickey-Fuller Test on "{name}"', "\n   ", '-'*47)
+    print(f' Null Hypothesis: Data has unit root. Non-Stationary.')
+    print(f' Significance Level    = {signif}')
+    print(f' Test Statistic        = {output["test_statistic"]}')
+    print(f' No. Lags Chosen       = {output["n_lags"]}')
+
+    for key,val in r[4].items():
+        print(f' Critical value {adjust(key)} = {round(val, 3)}')
+
+    if p_value <= signif:
+        print(f" => P-Value = {p_value}. Rejecting Null Hypothesis.")
+        print(f" => Series is Stationary.")
+    else:
+        print(f" => P-Value = {p_value}. Weak evidence to reject the Null Hypothesis.")
+        print(f" => Series is Non-Stationary.")    
+
+
+# ADF Test on each column
+for name, column in df_train.items():
+    adfuller_test(column, name=column.name)
+    print('\n')
