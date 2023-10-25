@@ -135,7 +135,8 @@ def adfuller_test(series, signif=0.05, name='', verbose=False):
     def adjust(val, length= 6): return str(val).ljust(length)
 
     # Create a summary string
-    summary = f'Augmented Dickey-Fuller Test on "{name}"\n'
+    summary = f"===================================================\n"
+    summary += f'Augmented Dickey-Fuller Test on "{name}"\n'
     summary += ' ' + '-'*47 + '\n'
     summary += f'Null Hypothesis: Data has unit root. Non-Stationary.\n'
     summary += f'Significance Level    = {signif}\n'
@@ -151,7 +152,6 @@ def adfuller_test(series, signif=0.05, name='', verbose=False):
     else:
         summary += f"=> P-Value = {p_value}. Weak evidence to reject the Null Hypothesis.\n"
         summary += f"=> Series is Non-Stationary.\n"
-        summary += f"\n"
 
     return summary
 
@@ -174,3 +174,56 @@ with open(output_file_path3, 'w') as file:
 
 # Print a message indicating the file has been saved
 print(f"Output saved to {output_file_path3}")
+
+
+####---------The ADF test confirms none of the time series is stationary. 
+####---------Let’s difference all of them once and check again:
+
+# 1st difference
+df_differenced = df_train.diff().dropna()
+
+# ADF Test on each column of 1st Differences Dataframe
+output_strings_1diff = []
+for name, column in df_differenced.items():
+    output_string_1diff = adfuller_test(column, name=column.name)
+    output_strings_1diff.append(output_string_1diff)
+    print(output_string_1diff)
+    print('\n')
+
+# Define the output file path
+output_file_path3_1diff = "adfuller_test_output_1diff.txt"
+
+# Save the output strings to a text file
+with open(output_file_path3_1diff, 'w') as file:
+    for output_string_1diff in output_strings_1diff:
+        file.write(output_string_1diff)
+
+# Print a message indicating the file has been saved
+print(f"Output saved to {output_file_path3_1diff}")
+
+
+
+####---------The ADF test confirms some of the time series are stationary but not everyone. 
+####---------Let’s difference all of them once and check again:
+
+# 2st difference
+df_differenced2 = df_differenced.diff().dropna()
+
+# ADF Test on each column of 2st Differences Dataframe
+output_strings_2diff = []
+for name, column in df_differenced2.items():
+    output_string_2diff = adfuller_test(column, name=column.name)
+    output_strings_2diff.append(output_string_2diff)
+    print(output_string_2diff)
+    print('\n')
+
+# Define the output file path
+output_file_path3_2diff = "adfuller_test_output_2diff.txt"
+
+# Save the output strings to a text file
+with open(output_file_path3_2diff, 'w') as file:
+    for output_string_2diff in output_strings_2diff:
+        file.write(output_string_2diff)
+
+# Print a message indicating the file has been saved
+print(f"Output saved to {output_file_path3_2diff}")
