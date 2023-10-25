@@ -157,6 +157,7 @@ def adfuller_test(series, signif=0.05, name='', verbose=False):
 
 
 # ADF Test on each column
+print('ADF Test on original series:\n')
 output_strings = []
 for name, column in df_train.items():
     output_string = adfuller_test(column, name=column.name)
@@ -183,6 +184,7 @@ print(f"Output saved to {output_file_path3}")
 df_differenced = df_train.diff().dropna()
 
 # ADF Test on each column of 1st Differences Dataframe
+print('ADF Test on 1rst differenced series:\n')
 output_strings_1diff = []
 for name, column in df_differenced.items():
     output_string_1diff = adfuller_test(column, name=column.name)
@@ -210,6 +212,7 @@ print(f"Output saved to {output_file_path3_1diff}")
 df_differenced2 = df_differenced.diff().dropna()
 
 # ADF Test on each column of 2st Differences Dataframe
+print('ADF Test on 2nd differenced series:\n')
 output_strings_2diff = []
 for name, column in df_differenced2.items():
     output_string_2diff = adfuller_test(column, name=column.name)
@@ -227,3 +230,30 @@ with open(output_file_path3_2diff, 'w') as file:
 
 # Print a message indicating the file has been saved
 print(f"Output saved to {output_file_path3_2diff}")
+
+
+
+############ 10. Select the Order (P) of VAR model
+############ We do this with the stationary series
+model = VAR(df_differenced2)
+fitComparison = f'Fit comparison estimates to Select the Order (P) of the VAR model\n'
+for i in [1,2,3,4,5,6,7,8,9]:
+    result = model.fit(i)
+    print('Lag Order =', i)
+    print('AIC : ', result.aic)
+    print('BIC : ', result.bic)
+    print('FPE : ', result.fpe)
+    print('HQIC: ', result.hqic, '\n')
+    fitComparison += f'-----------------------------\n'
+    fitComparison += f'Lag Order ="{i}"\n'
+    fitComparison += f'AIC : "{result.aic}"\n'
+    fitComparison += f'BIC : "{result.bic}"\n'
+    fitComparison += f'FPE : "{result.fpe}"\n'
+    fitComparison += f'HQIC : "{result.hqic}"\n'
+
+# Define the output file path
+output_file_path4 = "fitComparison_tests.txt"
+
+# Save the output strings to a text file
+with open(output_file_path4, 'w') as file:
+    file.write(fitComparison)
