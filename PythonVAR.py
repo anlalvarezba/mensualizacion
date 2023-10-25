@@ -8,6 +8,8 @@ from statsmodels.tsa.api import VAR
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tools.eval_measures import rmse, aic
 
+import sys
+
 #######Import the datasets
 filepath = 'https://raw.githubusercontent.com/selva86/datasets/master/Raotbl6.csv'
 df = pd.read_csv(filepath, parse_dates=['date'], index_col='date')
@@ -257,3 +259,14 @@ output_file_path4 = "fitComparison_tests.txt"
 # Save the output strings to a text file
 with open(output_file_path4, 'w') as file:
     file.write(fitComparison)
+
+##### Alternate method to choose the order(p):
+x = model.select_order(maxlags=12)
+alternateEstimates = x.summary()
+print(alternateEstimates)
+
+# Define the output file path
+output_file_path5 = "fitComparison_alternative.txt"
+
+with open(output_file_path5, 'w') as sys.stdout:
+    print(alternateEstimates)
