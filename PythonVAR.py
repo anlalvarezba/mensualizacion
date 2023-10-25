@@ -134,13 +134,6 @@ def adfuller_test(series, signif=0.05, name='', verbose=False):
     p_value = output['pvalue'] 
     def adjust(val, length= 6): return str(val).ljust(length)
 
-    # Print Summary
-    # print(f'    Augmented Dickey-Fuller Test on "{name}"', "\n   ", '-'*47)
-    # print(f' Null Hypothesis: Data has unit root. Non-Stationary.')
-    # print(f' Significance Level    = {signif}')
-    # print(f' Test Statistic        = {output["test_statistic"]}')
-    # print(f' No. Lags Chosen       = {output["n_lags"]}')
-
     # Create a summary string
     summary = f'Augmented Dickey-Fuller Test on "{name}"\n'
     summary += ' ' + '-'*47 + '\n'
@@ -149,19 +142,13 @@ def adfuller_test(series, signif=0.05, name='', verbose=False):
     summary += f'Test Statistic        = {output["test_statistic"]}\n'
     summary += f'No. Lags Chosen       = {output["n_lags"]}\n'
 
-
     for key,val in r[4].items():
-        # print(f' Critical value {adjust(key)} = {round(val, 3)}')
         summary += f'Critical value {adjust(key)} = {round(val, 3)}\n'
 
     if p_value <= signif:
-        # print(f" => P-Value = {p_value}. Rejecting Null Hypothesis.")
-        # print(f" => Series is Stationary.")
         summary += f"=> P-Value = {p_value}. Rejecting Null Hypothesis.\n"
         summary += f"=> Series is Stationary.\n"
     else:
-        # print(f" => P-Value = {p_value}. Weak evidence to reject the Null Hypothesis.")
-        # print(f" => Series is Non-Stationary.") 
         summary += f"=> P-Value = {p_value}. Weak evidence to reject the Null Hypothesis.\n"
         summary += f"=> Series is Non-Stationary.\n"
         summary += f"\n"
