@@ -8,6 +8,7 @@ from statsmodels.tsa.api import VAR
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tools.eval_measures import rmse, aic
 
+from tabulate import tabulate
 import sys
 
 #######Import the datasets
@@ -268,5 +269,20 @@ print(alternateEstimates)
 # Define the output file path
 output_file_path5 = "fitComparison_alternative.txt"
 
-with open(output_file_path5, 'w') as sys.stdout:
-    print(alternateEstimates)
+
+# Save the output table to a text file
+with open(output_file_path5, 'w') as file:
+    file.write(tabulate(alternateEstimates))
+
+
+############ 11. Train the VAR Model of Selected Order(p)
+modelfitted = model.fit(4)
+regressionsummary = modelfitted.summary()
+
+# Define the output file path to save it
+output_file_path6 = "VarRegression_results.txt"
+sys.stdout = open(output_file_path6, 'w')
+print(regressionsummary)
+print(type(regressionsummary))
+# Close the output file
+sys.stdout.close()
