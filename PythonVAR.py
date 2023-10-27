@@ -8,6 +8,7 @@ from statsmodels.tsa.api import VAR
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tools.eval_measures import rmse, aic
 from statsmodels.stats.stattools import durbin_watson
+from statsmodels.tsa.stattools import acf
 
 from tabulate import tabulate
 import sys
@@ -33,7 +34,7 @@ for i, ax in enumerate(axes.flatten()):
     ax.tick_params(labelsize=6)
 
 plt.tight_layout();
-plt.savefig("filename.png")
+plt.savefig("originalTimeSeries.png")
 
 #######Testing Causation using Granger’s Causality Test
 from statsmodels.tsa.stattools import grangercausalitytests
@@ -358,4 +359,109 @@ df_results.to_csv(output_file_path8)
 
 # Print a message indicating the file has been saved
 print(f"Output saved to {output_file_path8}")
+
+
+
+############# 15. Plot of Forecast vs Actuals
+fig, axes = plt.subplots(nrows=int(len(df.columns)/2), ncols=2, dpi=150, figsize=(10,10))
+for i, (col,ax) in enumerate(zip(df.columns, axes.flatten())):
+    df_results[col+'_forecast'].plot(legend=True, ax=ax).autoscale(axis='x',tight=True)
+    df_test[col][-nobs:].plot(legend=True, ax=ax);
+    ax.set_title(col + ": Forecast vs Actuals")
+    ax.xaxis.set_ticks_position('none')
+    ax.yaxis.set_ticks_position('none')
+    ax.spines["top"].set_alpha(0)
+    ax.tick_params(labelsize=6)
+
+plt.tight_layout();
+plt.savefig("forecastsVsActuals.png")
+
+
+
+############### 16. Evaluate the Forecasts
+#### Compute a set of metrics: MAPE, ME, MAE, MPE, RMSE, corr and minmax.
+def forecast_accuracy(forecast, actual):
+    forecast = np.array(forecast)  # Convert to NumPy array
+    actual = np.array(actual)      # Convert to NumPy array
+
+    mape = np.mean(np.abs(forecast - actual)/np.abs(actual))  # MAPE
+    me = np.mean(forecast - actual)             # ME
+    mae = np.mean(np.abs(forecast - actual))    # MAE
+    mpe = np.mean((forecast - actual)/actual)   # MPE
+    rmse = np.mean((forecast - actual)**2)**.5  # RMSE
+    corr = np.corrcoef(forecast, actual)[0,1]   # corr
+    mins = np.amin(np.column_stack([forecast, actual]), axis=1)
+    maxs = np.amax(np.column_stack([forecast, actual]), axis=1)
+    minmax = 1 - np.mean(mins/maxs)             # minmax
+    return({'mape':mape, 'me':me, 'mae': mae, 
+            'mpe': mpe, 'rmse':rmse, 'corr':corr, 'minmax':minmax})
+
+forecastAccuracy = f'Metrics to evaluate the forecast accuracy:\n'
+forecastAccuracy += f'______________________________________________\n'
+
+print('Forecast Accuracy of: rgnp')
+forecastAccuracy += f'Forecast Accuracy of: rgnp\n'
+accuracy_prod = forecast_accuracy(df_results['rgnp_forecast'].values, df_test['rgnp'])
+for k, v in accuracy_prod.items():
+    print(k.rjust(10), ': ', round(v,4))
+    forecastAccuracy += f'{k.rjust(10)} : {round(v,4)}\n'
+
+print('\nForecast Accuracy of: pgnp')
+forecastAccuracy += f'Forecast Accuracy of: pgnp\n'
+accuracy_prod = forecast_accuracy(df_results['pgnp_forecast'].values, df_test['pgnp'])
+for k, v in accuracy_prod.items():
+    print(k.rjust(10), ': ', round(v,4))
+    forecastAccuracy += f'{k.rjust(10)} : {round(v,4)}\n'
+
+print('\nForecast Accuracy of: ulc')
+forecastAccuracy += f'Forecast Accuracy of: ulc\n'
+accuracy_prod = forecast_accuracy(df_results['ulc_forecast'].values, df_test['ulc'])
+for k, v in accuracy_prod.items():
+    print(k.rjust(10), ': ', round(v,4))
+    forecastAccuracy += f'{k.rjust(10)} : {round(v,4)}\n'
+
+print('\nForecast Accuracy of: gdfco')
+forecastAccuracy += f'Forecast Accuracy of: gdfco\n'
+accuracy_prod = forecast_accuracy(df_results['gdfco_forecast'].values, df_test['gdfco'])
+for k, v in accuracy_prod.items():
+    print(k.rjust(10), ': ', round(v,4))
+    forecastAccuracy += f'{k.rjust(10)} : {round(v,4)}\n'
+
+print('\nForecast Accuracy of: gdf')
+forecastAccuracy += f'Forecast Accuracy of: gdf\n'
+accuracy_prod = forecast_accuracy(df_results['gdf_forecast'].values, df_test['gdf'])
+for k, v in accuracy_prod.items():
+    print(k.rjust(10), ': ', round(v,4))
+    forecastAccuracy += f'{k.rjust(10)} : {round(v,4)}\n'
+
+print('\nForecast Accuracy of: gdfim')
+forecastAccuracy += f'Forecast Accuracy of: gdfim\n'
+accuracy_prod = forecast_accuracy(df_results['gdfim_forecast'].values, df_test['gdfim'])
+for k, v in accuracy_prod.items():
+    print(k.rjust(10), ': ', round(v,4))
+    forecastAccuracy += f'{k.rjust(10)} : {round(v,4)}\n'
+
+print('\nForecast Accuracy of: gdfcf')
+forecastAccuracy += f'Forecast Accuracy of: gdfcf\n'
+accuracy_prod = forecast_accuracy(df_results['gdfcf_forecast'].values, df_test['gdfcf'])
+for k, v in accuracy_prod.items():
+    print(k.rjust(10), ': ', round(v,4))
+    forecastAccuracy += f'{k.rjust(10)} : {round(v,4)}\n'
+
+print('\nForecast Accuracy of: gdfce')
+forecastAccuracy += f'Forecast Accuracy of: gdfce\n'
+accuracy_prod = forecast_accuracy(df_results['gdfce_forecast'].values, df_test['gdfce'])
+for k, v in accuracy_prod.items():
+    print(k.rjust(10), ': ', round(v,4))
+    forecastAccuracy += f'{k.rjust(10)} : {round(v,4)}\n'
+
+# Define the output file path
+output_file_path9 = "forecastsAccuracy.txt"
+
+# Save the Forecasts accuracy metrics to a text file
+with open(output_file_path9, 'w') as file:
+    file.write(forecastAccuracy)
+
+# Print a message indicating the file has been saved
+print(f"Output saved to {output_file_path9}")
 
