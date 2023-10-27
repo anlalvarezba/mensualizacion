@@ -310,3 +310,52 @@ with open(output_file_path7, 'w') as file:
 
 # Print a message indicating the file has been saved
 print(f"Output saved to {output_file_path7}")
+
+
+########### 13. Forecast VAR model using statsmodels
+# Get the lag order
+lag_order = model_fitted.k_ar
+print(lag_order)  #> 4
+
+# Input data for forecasting
+forecast_input = df_differenced2.values[-lag_order:]
+forecast_input
+print(forecast_input)
+
+# Forecast
+fc = model_fitted.forecast(y=forecast_input, steps=nobs)
+df_forecast = pd.DataFrame(fc, index=df.index[-nobs:], columns=df.columns + '_2d')
+df_forecast
+print(df_forecast)
+
+
+
+######## 14. Invert the transformation to get the real forecast
+def invert_transformation(df_train, df_forecast, second_diff=False):
+    """Revert back the differencing to get the forecast to original scale."""
+    df_fc = df_forecast.copy()
+    columns = df_train.columns
+    for col in columns:        
+        # Roll back 2nd Diff
+        if second_diff:
+            df_fc[str(col)+'_1d'] = (df_train[col].iloc[-1]-df_train[col].iloc[-2]) + df_fc[str(col)+'_2d'].cumsum()
+        # Roll back 1st Diff
+        df_fc[str(col)+'_forecast'] = df_train[col].iloc[-1] + df_fc[str(col)+'_1d'].cumsum()
+    return df_fc
+
+df_results = invert_transformation(df_train, df_forecast, second_diff=True)        
+df_results.loc[:, ['rgnp_forecast', 'pgnp_forecast', 'ulc_forecast', 'gdfco_forecast',
+                   'gdf_forecast', 'gdfim_forecast', 'gdfcf_forecast', 'gdfce_forecast']]
+
+# Print forecasts on their original scale on console
+print(df_results)
+
+# Define the output file path
+output_file_path8 = "forecastsOriginalScale.csv"
+
+# Save the forecasts in their original scale as .csv file
+df_results.to_csv(output_file_path8)
+
+# Print a message indicating the file has been saved
+print(f"Output saved to {output_file_path8}")
+
