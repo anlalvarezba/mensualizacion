@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from statsmodels.tsa.api import VAR
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.tools.eval_measures import rmse, aic
+from statsmodels.stats.stattools import durbin_watson
 
 from tabulate import tabulate
 import sys
@@ -276,13 +277,36 @@ with open(output_file_path5, 'w') as file:
 
 
 ############ 11. Train the VAR Model of Selected Order(p)
-modelfitted = model.fit(4)
-regressionsummary = modelfitted.summary()
+model_fitted = model.fit(4)
+regressionsummary = model_fitted.summary()
 
 # Define the output file path to save it
 output_file_path6 = "VarRegression_results.txt"
 sys.stdout = open(output_file_path6, 'w')
 print(regressionsummary)
 print(type(regressionsummary))
+# Reset sys.stdout to its original value
+sys.stdout = sys.__stdout__
 # Close the output file
-sys.stdout.close()
+# sys.stdout.close()
+# Print a message indicating the file has been saved
+print(f"Output saved to {output_file_path6}")
+
+
+########### 12. Check for Serial Correlation of Residuals (Errors) using Durbin Watson Statistic
+out = durbin_watson(model_fitted.resid)
+residualsCorrelation = f'Serial Correlation of Residuals (Errors):\n'
+print(f'Serial Correlation of Residuals (Errors):')
+for col, val in zip(df.columns, out):
+    print(col.rjust(10), ':', round(val, 2))
+    residualsCorrelation += f'{col.rjust(10)} : {round(val, 2)}\n'
+
+# Define the output file path
+output_file_path7 = "residualsCorrelation.txt"
+
+# Save the Residuals Correlation to a text file
+with open(output_file_path7, 'w') as file:
+    file.write(residualsCorrelation)
+
+# Print a message indicating the file has been saved
+print(f"Output saved to {output_file_path7}")
