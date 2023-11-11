@@ -14,7 +14,8 @@ from tabulate import tabulate
 import sys
 
 #######Import the datasets
-filepath = 'https://raw.githubusercontent.com/selva86/datasets/master/Raotbl6.csv'
+filepath = 'datadownloaded.csv'
+# filepath = 'https://raw.githubusercontent.com/selva86/datasets/master/Raotbl6.csv'
 df = pd.read_csv(filepath, parse_dates=['date'], index_col='date')
 print(df.shape)  # (123, 8)
 df.tail()
@@ -465,3 +466,53 @@ with open(output_file_path9, 'w') as file:
 # Print a message indicating the file has been saved
 print(f"Output saved to {output_file_path9}")
 
+
+
+################# IMPULSE RESPONSE FUNCTIONS
+periods = 12  # Number of periods for impulse response function
+irf = model_fitted.irf(periods)
+
+# Plot the impulse response functions and save to a file
+fig = irf.plot(orth=True)
+plt.savefig("irf_plot.png")  # You can specify the desired file format (e.g., .png, .pdf)
+
+# Close the plot to release resources (optional)
+plt.close()
+
+cummulative = irf.plot_cum_effects(orth=False)
+
+# Save the plot to a file (e.g., in PNG format)
+plt.savefig("irfCummulative_plot.png")
+
+# Close the plot to release resources (optional)
+plt.close()
+
+
+################ VARIANCE DECOMPOSITION
+# Calculate the Forecast Error Variance Decomposition (FEVD)
+fevd = model_fitted.fevd()
+
+# Define the output file path to save it
+output_file_path10 = "varianceDecomposition.txt"
+sys.stdout = open(output_file_path10, 'w')
+print(fevd.summary())
+print(type(fevd.summary()))
+# Reset sys.stdout to its original value
+sys.stdout = sys.__stdout__
+# Close the output file
+# sys.stdout.close()
+# Print a message indicating the file has been saved
+print(f"Output saved to {output_file_path10}")
+
+# Plot the FEVD
+fevd.plot()
+
+# Save the plot to a file (e.g., in PNG format)
+plt.savefig("fevd_plot.png")
+
+# Close the plot to release resources (optional)
+plt.close()
+
+
+# Print a message indicating everything finished.
+print(f"Process completed. Good job!")
